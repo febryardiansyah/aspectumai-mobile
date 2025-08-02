@@ -7,32 +7,32 @@ import 'package:aspectumai/core/widgets/app_button.dart';
 import 'package:aspectumai/core/widgets/app_spacer.dart';
 import 'package:aspectumai/core/widgets/app_text_form.dart';
 import 'package:go_router/go_router.dart';
-import 'package:aspectumai/features/auth/bloc/register/register_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/widgets/snackbar.dart';
 import '../../../../dependency_injection.dart';
+import '../../bloc/reset_password/reset_password_cubit.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+class ResetPasswordScreen extends StatelessWidget {
+  const ResetPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => RegisterCubit(sl()),
-      child: const _RegisterScreenBody(),
+      create: (context) => ResetPasswordCubit(sl()),
+      child: const _ResetPasswordScreenBody(),
     );
   }
 }
 
-class _RegisterScreenBody extends StatefulWidget {
-  const _RegisterScreenBody();
+class _ResetPasswordScreenBody extends StatefulWidget {
+  const _ResetPasswordScreenBody();
 
   @override
-  State<_RegisterScreenBody> createState() => _RegisterScreenBodyState();
+  State<_ResetPasswordScreenBody> createState() => _ResetPasswordScreenBodyState();
 }
 
-class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
+class _ResetPasswordScreenBodyState extends State<_ResetPasswordScreenBody> {
   final _formKey = GlobalKey<FormState>();
 
   final fullNameController = TextEditingController();
@@ -47,19 +47,19 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      body: BlocListener<RegisterCubit, RegisterState>(
+      body: BlocListener<ResetPasswordCubit, ResetPasswordState>(
         listener: (context, state) {
-          if (state is RegisterLoading) {
+          if (state is ResetPasswordLoading) {
             AppSnackbar.showLoading(context);
           }
-          if (state is RegisterSuccess) {
+          if (state is ResetPasswordSuccess) {
             AppSnackbar.hide(context);
             AppSnackbar.showSuccess(context, message: state.message);
 
-            // redirect to OTP
-            context.go(rOtp, extra: emailController.text);
+            // redirect to Login
+            context.go(rLogin);
           }
-          if (state is RegisterFailure) {
+          if (state is ResetPasswordFailure) {
             AppSnackbar.hide(context);
             AppSnackbar.showError(context, message: state.error);
           }
@@ -85,10 +85,10 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                     ),
 
                     /// content
-                    Align(
+                    const Align(
                       alignment: Alignment.bottomLeft,
                       child: Padding(
-                        padding: const EdgeInsets.only(
+                        padding: EdgeInsets.only(
                           left: 24,
                           right: 40,
                           bottom: 40,
@@ -97,45 +97,12 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            GestureDetector(
-                              onTap: () {
-                                context.pop();
-                              },
-                              child: const Icon(
-                                Icons.arrow_back_sharp,
-                                color: AppColors.white,
-                              ),
-                            ),
-                            const AppSpacer.height(24),
-                            const Text(
-                              'Register',
+                            AppSpacer.height(24),
+                            Text(
+                              'Reset Password',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 32,
-                              ),
-                            ),
-                            const AppSpacer.height(12),
-                            GestureDetector(
-                              onTap: () {
-                                context.pop();
-                              },
-                              child: const Text.rich(
-                                TextSpan(
-                                  text: "Already have an account?",
-                                  children: [
-                                    TextSpan(
-                                      text: ' Sign in',
-                                      style: TextStyle(
-                                        color: AppColors.blue,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
                               ),
                             ),
                           ],
@@ -153,45 +120,6 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      AppTextForm(
-                        label: 'Full name',
-                        hint: 'Enter your full name',
-                        type: AppTextFormType.outlined,
-                        backgroundColor: AppColors.white,
-                        controller: fullNameController,
-                        validator: (value) => value == null || value.isEmpty
-                            ? 'Full name is required'
-                            : null,
-                      ),
-                      const AppSpacer.height(16),
-                      AppTextForm(
-                        label: 'Username',
-                        hint: 'Enter your username',
-                        type: AppTextFormType.outlined,
-                        backgroundColor: AppColors.white,
-                        controller: usernameController,
-                        validator: (value) => value == null || value.isEmpty
-                            ? 'Username is required'
-                            : null,
-                      ),
-                      const AppSpacer.height(16),
-                      AppTextForm(
-                        label: 'Email',
-                        hint: 'Enter your email',
-                        type: AppTextFormType.outlined,
-                        backgroundColor: AppColors.white,
-                        controller: emailController,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Email is required';
-                          }
-                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                            return 'Enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                      const AppSpacer.height(16),
                       AppTextForm(
                         label: 'Password',
                         hint: 'Enter your password',
@@ -222,28 +150,34 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                         },
                       ),
                       const AppSpacer.height(16),
-                      const Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          'Forgot password?',
-                          style: TextStyle(
-                            color: AppColors.blue,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                      AppTextForm(
+                        label: 'Confirm Password',
+                        hint: 'Enter your confirm password',
+                        type: AppTextFormType.outlined,
+                        backgroundColor: AppColors.white,
+                        controller: passwordController,
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Confirm Password is required';
+                          }
+                          if (value != passwordController.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
                       ),
                       const AppSpacer.height(32),
                       AppButton(
-                        text: 'Register',
+                        text: 'Reset Password',
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
                             // Handle registration logic here
-                            context.read<RegisterCubit>().register(
-                                  fullNameController.text,
-                                  usernameController.text,
-                                  emailController.text,
-                                  passwordController.text,
-                                );
+                            context.read<ResetPasswordCubit>().resetPassword(
+                              emailController.text,
+                              passwordController.text,
+                              "otp",
+                            );
                           }
                         },
                         width: context.screenWidth,

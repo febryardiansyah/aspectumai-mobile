@@ -56,6 +56,7 @@ class _ForgotPasswordScreenBodyState extends State<_ForgotPasswordScreenBody> {
           if (state.isSuccess) {
             context.pop();
             AppSnackbar.showSuccess(context, message: state.data);
+            context.pushReplacement(rOtp, extra: emailController.text);
           }
           if (state.isError) {
             context.pop();

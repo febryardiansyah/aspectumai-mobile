@@ -33,8 +33,12 @@ class AppRouter {
           builder: (context, state) => const ForgotPasswordScreen(),
         ),
         GoRoute(
+          path: rResetPassword,
+          builder: (context, state) => const ForgotPasswordScreen(),
+        ),
+        GoRoute(
           path: rHome,
-          builder: (context, state) => HomeScreen(),
+          builder: (context, state) => const HomeScreen(),
         ),
         GoRoute(
           path: rChat,
@@ -50,5 +54,6 @@ String get rLogin => '/login';
 String get rRegister => '/register';
 String get rOtp => '/otp';
 String get rForgotPassword => '/forgot-password';
+String get rResetPassword => '/reset-password';
 String get rHome => '/home';
 String get rChat => '/chat';

@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primaryColor: AppColors.primary,
           scaffoldBackgroundColor: AppColors.primary,
-          dialogTheme: const DialogTheme(
+          dialogTheme: const DialogThemeData(
             surfaceTintColor: AppColors.white,
           ),
           appBarTheme: const AppBarTheme(

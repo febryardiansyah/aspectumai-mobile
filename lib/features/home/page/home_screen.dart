@@ -1,6 +1,5 @@
 import 'package:aspectumai/core/app_route.dart';
 import 'package:aspectumai/core/widgets/app_elevated_button_widget.dart';
-import 'package:aspectumai/core/widgets/snackbar.dart';
 import 'package:aspectumai/dependency_injection.dart';
 import 'package:aspectumai/features/auth/bloc/auth/auth_cubit.dart';
 import 'package:aspectumai/features/chat/bloc/create_chat_session/create_chat_session_cubit.dart';

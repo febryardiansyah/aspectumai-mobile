@@ -11,6 +11,9 @@ abstract class IAuthRepository {
     required String email,
     required EmailVerificationType type,
   });
+  Future<String> resendOTP(String email);
+  Future<String> verifyOTP(String email, String otp);
+  Future<String> resetPassword(String email, String password, String otp);
   Future<void> logout();
 }
 
@@ -85,4 +88,62 @@ class AuthRepository implements IAuthRepository {
       throw e.error.toString();
     }
   }
+
+  @override
+  Future<String> verifyOTP(String email, String otp) async {
+    try {
+      final response = await _client.post(
+        'auth/verify-otp',
+        data: {
+          'email': email,
+          'otp': otp,
+        },
+      );
+
+      final data = MetaModel.fromJson(response.data['meta']);
+
+      return data.message ?? '';
+    } on DioException catch (e) {
+      throw e.error.toString();
+    }
+  }
+
+  @override
+  Future<String> resendOTP(String email) async {
+    try {
+      final response = await _client.post(
+        'auth/resend-otp',
+        data: {
+          'email': email,
+        },
+      );
+
+      final data = MetaModel.fromJson(response.data['meta']);
+
+      return data.message ?? '';
+    } on DioException catch (e) {
+      throw e.error.toString();
+    }
+  }
+
+  @override
+  Future<String> resetPassword(String email, String password, String otp) async {
+    try {
+      final response = await _client.post(
+        'auth/reset-password',
+        data: {
+          'email': email,
+          'password': password,
+          'otp': otp,
+        },
+      );
+
+      final data = MetaModel.fromJson(response.data['meta']);
+
+      return data.message ?? '';
+    } on DioException catch (e) {
+      throw e.error.toString();
+    }
+  }
+
 }
