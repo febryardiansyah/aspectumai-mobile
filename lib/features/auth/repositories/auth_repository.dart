@@ -71,7 +71,7 @@ class AuthRepository implements IAuthRepository {
   }) async {
     try {
       final response = await _client.post(
-        'auth/sign-up/email-verification',
+        'auth/email-verification',
         data: {
           'email': email,
           'type': type.value,
