@@ -1,49 +1,55 @@
-import 'package:flutter_gemini_ai/core/constants/constants.dart';
-import 'package:flutter_gemini_ai/features/chat/data/data_sources/chat_source.dart';
-import 'package:flutter_gemini_ai/features/chat/data/data_sources/gemini_source.dart';
-import 'package:flutter_gemini_ai/features/chat/data/repositories/chat_repository_impl.dart';
-import 'package:flutter_gemini_ai/features/chat/domain/repositories/chat_repository.dart';
-import 'package:flutter_gemini_ai/features/chat/domain/repositories/image_picker_repository.dart';
-import 'package:flutter_gemini_ai/features/chat/domain/usecases/send_chat.dart';
-import 'package:flutter_gemini_ai/features/chat/domain/usecases/send_chat_with_image.dart';
-import 'package:flutter_gemini_ai/features/chat/presentation/bloc/chat/chat_bloc.dart';
+import 'package:aspectumai/core/network/dio_client.dart';
+import 'package:aspectumai/core/utils/shared_pref_utils.dart';
+import 'package:aspectumai/features/auth/bloc/email_verification/email_verification_cubit.dart';
+import 'package:aspectumai/features/auth/bloc/otp/otp_cubit.dart';
+import 'package:aspectumai/features/auth/repositories/auth_repository.dart';
+import 'package:aspectumai/features/chat/repositories/chat_repository.dart';
+import 'package:aspectumai/features/chat/bloc/chat/chat_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'features/chat/data/repositories/image_picker_repository_impl.dart';
-import 'features/chat/domain/usecases/pick_image.dart';
-import 'features/chat/presentation/bloc/image_picker/image_picker_cubit.dart';
+import 'features/auth/bloc/auth/auth_cubit.dart';
+import 'features/auth/bloc/login/login_cubit.dart';
+import 'core/bloc/image_picker/image_picker_cubit.dart';
+import 'features/auth/bloc/reset_password/reset_password_cubit.dart';
+import 'features/chat/bloc/create_chat_session/create_chat_session_cubit.dart';
+import 'features/chat/bloc/delete_chat_session/delete_chat_session_cubit.dart';
 
 final sl = GetIt.instance;
 
 Future<void> registerDependencies() async {
   final imagePicker = ImagePicker();
-  final model = GenerativeModel(
-    model: 'gemini-1.5-flash-latest',
-    // model: 'gemini-pro',
-    apiKey: APIKEY,
-  );
 
   sl.registerLazySingleton(() => imagePicker);
 
-  /// source
-  sl.registerLazySingleton<ChatSource>(
-    () => GeminiSource(model: model),
-  );
+  sl.registerLazySingleton<DioClient>(() => DioClient());
 
-  /// repositories
-  sl.registerLazySingleton<ImagePickerRepository>(
-    () => ImagePickerRepositoryImpl(imagePicker: sl()),
-  );
-  sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
+  sl.registerFactory(() => SharePrefUtils());
 
-  /// usecases
-  sl.registerLazySingleton(() => PickImageUseCase(sl()));
-  sl.registerLazySingleton(() => SendChatUsecase(sl()));
-  sl.registerLazySingleton(() => SendChatWithImageUsecase(sl()));
+  _repositories();
+  _bloc();
+}
 
-  /// bloc
+/* data sources */
+void _repositories() {
+  sl.registerLazySingleton<IAuthRepository>(() => AuthRepository(sl()));
+  sl.registerLazySingleton<IChatRepository>(() => ChatRepository(sl()));
+}
+
+
+/* blocs */
+void _bloc() {
   sl.registerFactory(() => ImagePickerCubit(sl()));
-  sl.registerFactory(() => ChatBloc(sl(), sl()));
+  sl.registerFactory(() => ChatBloc(sl()));
+
+  /* auth */
+  sl.registerFactory(() => AuthCubit(sl()));
+  sl.registerFactory(() => LoginCubit(sl()));
+  sl.registerFactory(() => EmailVerificationCubit(sl()));
+  sl.registerFactory(() => OTPCubit(sl()));
+  sl.registerFactory(() => ResetPasswordCubit(sl()));
+
+  /* create chat session */
+  sl.registerFactory(() => CreateChatSessionCubit(sl()));
+  sl.registerFactory(() => DeleteChatSessionCubit(sl()));
 }

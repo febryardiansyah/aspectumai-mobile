@@ -5,10 +5,10 @@ abstract class DataState<T> {
   DataState({this.data, this.error});
 }
 
-class DataSuccess<T> extends DataState<T> {
-  DataSuccess(T data) : super(data: data);
+class DataStateSuccess<T> extends DataState<T> {
+  DataStateSuccess(T data) : super(data: data);
 }
 
-class DataError<T> extends DataState<T> {
-  DataError(dynamic error) : super(error: error);
+class DataStateError<T> extends DataState<T> {
+  DataStateError(dynamic error) : super(error: error);
 }

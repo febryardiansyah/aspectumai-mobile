@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gemini_ai/dependency_injection.dart';
-import 'package:flutter_gemini_ai/features/chat/presentation/bloc/chat/chat_bloc.dart';
-import 'package:flutter_gemini_ai/bloc/theme_cubit.dart';
-import 'package:flutter_gemini_ai/features/chat/presentation/chat_screen.dart';
-import 'package:flutter_gemini_ai/features/chat/presentation/bloc/image_picker/image_picker_cubit.dart';
+import 'package:aspectumai/core/app_route.dart';
+import 'package:aspectumai/core/resources/colors.dart';
+import 'package:aspectumai/dependency_injection.dart';
+import 'package:aspectumai/core/bloc/image_picker/image_picker_cubit.dart';
+import 'package:frosted_toast/frosted_toast.dart';
+
+import 'features/auth/bloc/auth/auth_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,36 +23,37 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => ChatBloc(sl(), sl()),
-        ),
-        BlocProvider(
           create: (_) => ImagePickerCubit(sl()),
         ),
         BlocProvider(
-          create: (_) => ThemeCubit()..getTheme(),
+          create: (_) => sl<AuthCubit>()..checkLogin(),
         ),
       ],
-      child: Builder(
-        builder: (context) {
-          return BlocBuilder<ThemeCubit, bool>(
-            builder: (context, state) {
-              return MaterialApp(
-                title: 'Flutter Gemin-AI Chat',
-                debugShowCheckedModeBanner: false,
-                themeMode: state ? ThemeMode.dark : ThemeMode.light,
-                theme: ThemeData(
-                  colorScheme: const ColorScheme.light(
-                    background: Colors.white,
-                  ),
-                ),
-                darkTheme: ThemeData(
-                  colorScheme: ColorScheme.dark(
-                    background: Colors.grey.shade900,
-                  ),
-                ),
-                home: const ChatScreen(),
-              );
-            },
+      child: MaterialApp.router(
+        title: 'Aspectum AI',
+        debugShowCheckedModeBanner: false,
+        routerConfig: AppRouter.router,
+        theme: ThemeData(
+          primaryColor: AppColors.primary,
+          scaffoldBackgroundColor: AppColors.primary,
+          dialogTheme: const DialogTheme(
+            surfaceTintColor: AppColors.white,
+          ),
+          appBarTheme: const AppBarTheme(
+            scrolledUnderElevation: 0,
+          ),
+          colorScheme: const ColorScheme.light(
+            surface: Colors.white,
+            onSurface: Colors.white,
+          ),
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(color: Colors.white),
+            bodyMedium: TextStyle(color: Colors.white),
+          ),
+        ),
+        builder: (context, child) {
+          return FrostedToastOverlay(
+            child: child ?? const Scaffold(),
           );
         },
       ),
