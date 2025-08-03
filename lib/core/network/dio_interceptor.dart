@@ -3,6 +3,9 @@ import 'dart:developer';
 import 'package:aspectumai/core/resources/constants.dart';
 import 'package:dio/dio.dart';
 
+import '../../dependency_injection.dart';
+import '../utils/shared_pref_utils.dart';
+
 class DioInterceptor extends InterceptorsWrapper {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
@@ -39,10 +42,12 @@ class DioInterceptor extends InterceptorsWrapper {
   }
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    final pref = await sl<SharePrefUtils>().sharedPref;
+    final token = pref.getString('token');
     options.baseUrl = ApiConstants.baseUrl;
-    options.headers['Authorization'] =
-        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJ5QGdtYWlsLmNvbSIsImlhdCI6MTc1MzAxMjA5OH0.E-CL78q3Bx4DoIssVRIRq_Yt30sNYGrrAd6DpJV0hiA';
+    options.headers['Authorization'] = 'Bearer $token';
 
     log('Request: ${options.method} ${options.path}');
 

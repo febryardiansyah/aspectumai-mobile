@@ -43,6 +43,8 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
 
   final passwordController = TextEditingController();
 
+  bool isPasswordVisible = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -198,7 +200,20 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                         type: AppTextFormType.outlined,
                         backgroundColor: AppColors.white,
                         controller: passwordController,
-                        obscureText: true,
+                        obscureText: !isPasswordVisible,
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isPasswordVisible = !isPasswordVisible;
+                            });
+                          },
+                          child: Icon(
+                            isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: AppColors.darkGrey,
+                          ),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Password is required';
@@ -206,15 +221,15 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                           if (value.length < 6) {
                             return 'Password must be at least 6 characters';
                           }
-                          if (!RegExp(r'[A-Z]').hasMatch(value)) {
-                            return 'Password must contain at least 1 uppercase letter';
-                          }
-                          if (!RegExp(r'[a-z]').hasMatch(value)) {
-                            return 'Password must contain at least 1 lowercase letter';
-                          }
-                          if (!RegExp(r'[0-9]').hasMatch(value)) {
-                            return 'Password must contain at least 1 number';
-                          }
+                          // if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                          //   return 'Password must contain at least 1 uppercase letter';
+                          // }
+                          // if (!RegExp(r'[a-z]').hasMatch(value)) {
+                          //   return 'Password must contain at least 1 lowercase letter';
+                          // }
+                          // if (!RegExp(r'[0-9]').hasMatch(value)) {
+                          //   return 'Password must contain at least 1 number';
+                          // }
                           // if (!RegExp(r'[!@#\$&*~^%()_+\-=\[\]{};\'\\:"|,.<>\/?]').hasMatch(value)) {
                           //   return 'Password must contain at least 1 special character';
                           // }

@@ -42,7 +42,9 @@ class AppRouter {
         ),
         GoRoute(
           path: rChat,
-          builder: (context, state) => const ChatScreen(),
+          builder: (context, state) => ChatScreen(
+            isCustomChat: state.extra as bool,
+          ),
         ),
       ],
     );

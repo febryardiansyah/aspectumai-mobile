@@ -1,3 +1,5 @@
+import 'package:aspectumai/core/utils/dialog_utils.dart';
+import 'package:aspectumai/core/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -146,7 +148,7 @@ class _OtpScreenBodyState extends State<_OtpScreenBody> {
                         height: double.infinity,
                         fit: BoxFit.cover,
                       ),
-          
+
                       /// content
                       Align(
                         alignment: Alignment.bottomLeft,
@@ -198,7 +200,7 @@ class _OtpScreenBodyState extends State<_OtpScreenBody> {
                     ],
                   ),
                 ),
-          
+
                 /// main content
                 Padding(
                   padding: const EdgeInsets.all(20),
@@ -206,7 +208,7 @@ class _OtpScreenBodyState extends State<_OtpScreenBody> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const AppSpacer.height(32),
-          
+
                       /// OTP Input Fields
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -228,8 +230,7 @@ class _OtpScreenBodyState extends State<_OtpScreenBody> {
                                 LengthLimitingTextInputFormatter(1),
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
-                              onChanged: (value) =>
-                                  _onOtpChanged(value, index),
+                              onChanged: (value) => _onOtpChanged(value, index),
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 10,
@@ -270,9 +271,9 @@ class _OtpScreenBodyState extends State<_OtpScreenBody> {
                           );
                         }),
                       ),
-          
+
                       const AppSpacer.height(32),
-          
+
                       /// Timer and Resend
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -301,18 +302,18 @@ class _OtpScreenBodyState extends State<_OtpScreenBody> {
                           ),
                         ],
                       ),
-          
+
                       const AppSpacer.height(32),
-          
+
                       /// Verify Button
                       AppButton(
                         text: 'Verify',
                         onPressed: _verifyOtp,
                         width: context.screenWidth,
                       ),
-          
+
                       const AppSpacer.height(16),
-          
+
                       /// Timer Text
                       GestureDetector(
                         onTap: _canResend ? _resendOtp : null,
@@ -321,9 +322,8 @@ class _OtpScreenBodyState extends State<_OtpScreenBody> {
                               ? 'Code expired'
                               : 'Code expires in $_formattedTime',
                           style: TextStyle(
-                            color: _canResend
-                                ? AppColors.primary
-                                : AppColors.grey,
+                            color:
+                                _canResend ? AppColors.primary : AppColors.grey,
                             fontSize: 12,
                             fontWeight: _canResend
                                 ? FontWeight.w500
@@ -347,34 +347,21 @@ class _OtpScreenBodyState extends State<_OtpScreenBody> {
     return BlocListener<OTPCubit, OTPState>(
       listener: (context, state) {
         if (state is OTPLoading) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Processing...'),
-              backgroundColor: AppColors.blue,
-            ),
-          );
-        } else if (state is OTPSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppColors.blue,
-            ),
-          );
+          DialogUtils.showLoadingDialog(context);
+        }
+        if (state is OTPSuccess) {
+          context.pop();
 
           if (state.isResend) {
             // If OTP was resent successfully, restart the timer
             _startTimer();
           } else {
             // If OTP was verified successfully, navigate to home screen
-            context.go(rHome);
+            context.go(rLogin);
           }
-        } else if (state is OTPFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.error),
-              backgroundColor: AppColors.primary,
-            ),
-          );
+        }
+        if (state is OTPFailure) {
+          AppSnackbar.showError(context, message: state.error);
         }
       },
       child: _buildContent(),

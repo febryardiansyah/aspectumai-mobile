@@ -13,6 +13,7 @@ import 'features/auth/bloc/login/login_cubit.dart';
 import 'core/bloc/image_picker/image_picker_cubit.dart';
 import 'features/auth/bloc/reset_password/reset_password_cubit.dart';
 import 'features/chat/bloc/create_chat_session/create_chat_session_cubit.dart';
+import 'features/chat/bloc/delete_chat_session/delete_chat_session_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -50,4 +51,5 @@ void _bloc() {
 
   /* create chat session */
   sl.registerFactory(() => CreateChatSessionCubit(sl()));
+  sl.registerFactory(() => DeleteChatSessionCubit(sl()));
 }

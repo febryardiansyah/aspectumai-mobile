@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 abstract class IChatRepository {
   Future<ChatResponseModel> sendMessage(List<ChatMessageModel> messages);
   Future<void> createChatSession();
+  Future<void> deleteChatSession(int sessionId);
   // Future<String> sendMessageWithImage(String message, List<String> imagePaths);
 }
 
@@ -38,5 +39,10 @@ class ChatRepository implements IChatRepository {
   @override
   Future<void> createChatSession() async {
     await _dioClient.post('$_path/session/new');
+  }
+
+  @override
+  Future<void> deleteChatSession(int sessionId) async {
+    await _dioClient.delete('$_path/session/$sessionId');
   }
 }

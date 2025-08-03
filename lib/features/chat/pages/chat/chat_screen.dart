@@ -1,5 +1,6 @@
 import 'package:aspectumai/dependency_injection.dart';
 import 'package:aspectumai/features/chat/bloc/chat/chat_bloc.dart';
+import 'package:aspectumai/features/chat/bloc/delete_chat_session/delete_chat_session_cubit.dart';
 import 'package:aspectumai/features/chat/models/chat_response_model.dart';
 import 'package:flutter/material.dart';
 import 'package:aspectumai/core/resources/illustrations.dart';
@@ -12,107 +13,54 @@ import 'package:flutter_svg/svg.dart';
 
 part 'widgets/chat_response.dart';
 part 'widgets/chat_input.dart';
+part 'widgets/custom_appbar.dart';
 
 class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+  final bool isCustomChat;
+  const ChatScreen({super.key, this.isCustomChat = false});
 
   @override
   Widget build(BuildContext context) {
     final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
 
-    return BlocProvider(
-      create: (_) => ChatBloc(sl()),
-      child: Scaffold(
-        bottomNavigationBar: Padding(
-          padding: EdgeInsets.only(bottom: bottomInsets),
-          child: _ChatInput(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => ChatBloc(sl()),
         ),
-        // floatingActionButton:
-        //     bottomInsets < 1 ? const _SuggestionStarters() : null,
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        appBar: AppBar(
-          backgroundColor: AppColors.primary,
-          iconTheme: const IconThemeData(color: AppColors.white),
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          title: Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  color: Colors.red,
-                ),
-              ),
-              const AppSpacer.width(14),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Text(
-                        'Math Solver',
-                        style: TextStyle(fontSize: 16, color: AppColors.white),
-                      ),
-                      const AppSpacer.width(8),
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(IllustrationConstants.coin,
-                                width: 10, height: 10),
-                            const AppSpacer.width(4),
-                            const Text(
-                              '1',
-                              style: TextStyle(
-                                  fontSize: 10, color: AppColors.white),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Row(
-                    children: [
-                      Text(
-                        'See details',
-                        style: TextStyle(fontSize: 10, color: AppColors.grey),
-                      ),
-                      AppSpacer.width(4),
-                      Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: AppColors.grey,
-                        size: 10,
-                      ),
-                    ],
-                  )
-                ],
-              ),
-              const Spacer(),
-              const Icon(Icons.bookmark_outline, color: AppColors.white),
-            ],
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1.0),
-            child: Container(
-              color: AppColors.secondary,
-              height: 1.0,
-            ),
-          ),
+        BlocProvider(
+          create: (_) => DeleteChatSessionCubit(sl()),
         ),
-        body: const _ChatBody(),
+      ],
+      child: PopScope(
+        onPopInvoked: (value){
+          context.read<DeleteChatSessionCubit>().deleteChatSession(5);
+        },
+        child: Scaffold(
+          bottomNavigationBar: Padding(
+            padding: EdgeInsets.only(bottom: bottomInsets),
+            child: _ChatInput(),
+          ),
+          // floatingActionButton:
+          //     bottomInsets < 1 ? const _SuggestionStarters() : null,
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          appBar: appBar,
+          body: _ChatBody(isCustomChat: isCustomChat),
+        ),
       ),
     );
+  }
+
+  PreferredSizeWidget get appBar {
+    return isCustomChat
+        ? const _CustomChatAppbar() as PreferredSizeWidget
+        : const _DefaultAppBar() as PreferredSizeWidget;
   }
 }
 
 class _ChatBody extends StatelessWidget {
-  const _ChatBody();
+  final bool isCustomChat;
+  const _ChatBody({required this.isCustomChat});
 
   @override
   Widget build(BuildContext context) {
